@@ -1,0 +1,11 @@
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Inclusions
+!lib/**
+
+# Compiled Files
+*.class
+bin/

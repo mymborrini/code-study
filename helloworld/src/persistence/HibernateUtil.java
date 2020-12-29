@@ -2,6 +2,7 @@ package persistence;
 
 import org.hibernate.*;
 import org.hibernate.cfg.*;
+import org.hibernate.tool.hbm2ddl.SchemaValidator;
 
 public class HibernateUtil {
 
@@ -10,18 +11,20 @@ public class HibernateUtil {
   static {
 
     try {
-      sessionFactory = new Configuration().configure().buildSessionFactory();
+      Configuration configuration = new Configuration().configure();
+      new SchemaValidator(configuration).validate();
+      sessionFactory = configuration.buildSessionFactory();
     } catch (Throwable ex) {
       throw new ExceptionInInitializerError(ex);
     }
 
   }
 
-  public static SessionFactory getSessionFactory(){
+  public static SessionFactory getSessionFactory() {
     return sessionFactory;
   }
 
-  public static void shutdown(){
+  public static void shutdown() {
     getSessionFactory().close();
   }
 

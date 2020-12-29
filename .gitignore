@@ -7,7 +7,7 @@
 .DS_Store
 
 # Inclusions
-!lib/**
+!**/lib/**
 
 # Compiled Files
 *.class

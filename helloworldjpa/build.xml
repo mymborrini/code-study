@@ -7,6 +7,7 @@
   <property name="src.java.dir" value="src" />
   <property name="lib.dir" value="lib" />
   <property name="build.dir" value="bin" />
+  <property name="src.etc.dir" value="etc" />
 
   <!-- Classpath declaration -->
   <path id="project.classpath">
@@ -43,7 +44,15 @@
         <patternset refid="meta.files" />
       </fileset>
     </copy>
+
+    <!-- Copy configuration files to etc -->
+    <copy todir="${build.dir}">
+      <fileset dir="${src.etc.dir}">
+        <patternset refid="meta.files" />
+      </fileset>
+    </copy>
   </target>
+
 
   <!-- Run HelloWorld-->
   <target name="run" depends="compile, copymetafiles" description="build and run hello world">

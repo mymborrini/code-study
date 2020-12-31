@@ -6,7 +6,7 @@ import javax.persistence.MappedSuperclass;
 // Mapped superclass is necessary if you want all the properies to be mapped
 
 @MappedSuperclass
-public class BillingDetails {
+public abstract class BillingDetails {
 
   @Column(name = "OWNER", nullable = false)
   private String owner;

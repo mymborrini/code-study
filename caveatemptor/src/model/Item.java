@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 /*
 This is an example to show that a lot of hibernate annotations does not exist in JPA

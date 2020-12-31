@@ -1,17 +1,16 @@
 package model;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
 
 @Entity
-@AttributeOverride(name = "owner", column = @Column(name = "CC_OWNER", nullable = false))
+@DiscriminatorValue("CC")
+@SecondaryTable(name = "CREDIT_CARD", pkJoinColumns = @PrimaryKeyJoinColumn(name = "CREDIT_CARD_ID"))
 public class CreditCard extends BillingDetails {
-
-  @Id
-  @Column(name = "CREDIT_CARD_ID")
-  private Long id = null;
 
   @Column(name = "NUMBER", nullable = false)
   private String number;
@@ -21,10 +20,6 @@ public class CreditCard extends BillingDetails {
 
   @Column(name = "EXP_YEAR", nullable = false)
   private String expYear;
-
-  public Long getId() {
-    return id;
-  }
 
   public String getNumber() {
     return number;
@@ -36,10 +31,6 @@ public class CreditCard extends BillingDetails {
 
   public String getExpYear() {
     return expYear;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public void setNumber(String number) {

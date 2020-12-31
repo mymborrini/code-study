@@ -14,7 +14,14 @@ import javax.persistence.InheritanceType;
  * denormalized schema can become a major burden in the long run. So this method
  * has better performace then TABLE_PER_CLASS but it can be really difficult to
  * maintein Starting from the fact that you cannot have not nullable columns in
- * your domain
+ * your domain. In this case since the table is One the query will be
+ * 
+ * select billing_details_id, billing_details_type, owner, cc_number,
+ * cc_exp_month, ..., ba_account, ba_bankname
+ * 
+ * from billing_details
+ * 
+ * where billing_details.billing_details_type = 'CC'
  */
 
 @Entity

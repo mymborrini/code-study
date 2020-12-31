@@ -1,17 +1,12 @@
 package model;
 
-import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
-@AttributeOverride(name = "owner", column = @Column(name = "BA_OWNER", nullable = false))
+@PrimaryKeyJoinColumn(name = "BANK_ACCOUNT_ID")
 public class BankAccount extends BillingDetails {
-
-  @Id
-  @Column(name = "BANK_ACCOUNT_ID")
-  private Long id = null;
 
   @Column(name = "ACCOUNT", nullable = false)
   private String account;
@@ -21,10 +16,6 @@ public class BankAccount extends BillingDetails {
 
   @Column(name = "SWIFT", nullable = false)
   private String swift;
-
-  public Long getId() {
-    return id;
-  }
 
   public String getAccount() {
     return account;
@@ -36,10 +27,6 @@ public class BankAccount extends BillingDetails {
 
   public String getSwift() {
     return swift;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public void setAccount(String account) {

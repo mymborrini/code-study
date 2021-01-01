@@ -56,8 +56,10 @@ public class Item {
   @Column(name = "ITEM_IMAGE")
   private byte[] image;
 
-  @org.hibernate.annotations.Type(type = "persistence.MonetaryAmountUserType")
-  @Column(name = "INITIAL_PRICE")
+  @org.hibernate.annotations.Type(type = "persistence.MonetatyAmountCompositeUserType")
+  @org.hibernate.annotations.Columns(columns = {
+      @Column(name = "INITIAL_PRICE", columnDefinition = "number(10,2) default '1'"),
+      @Column(name = "INITIAL_PRICE_CURRENCY", length = 2) })
   private MonetaryAmount initialPrice;
 
   /**

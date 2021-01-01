@@ -9,12 +9,19 @@ import java.util.HashSet;
 This is an example to show that a lot of hibernate annotations does not exist in JPA
 */
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DiscriminatorFormula;
+
+import persistence.MonetaryAmount;
 
 // This name is use in HQL if there is a conflict between java classes maybe with the
 // same name but in different packages
@@ -25,18 +32,43 @@ import org.hibernate.annotations.DiscriminatorFormula;
 public class Item {
 
   private String name;
-  private String description;
 
   /**
-   * This field is settled by default to 1 during insertion in this case you have
-   * to trigger a select after an insertion or update in order to get this value
-   * but you have to keep the column updatable and insertable
-   * 
+   * Hibernate provide a serialization fallback for property which is
+   * serializable, of course in database the byte stream is saved as a sequence of
+   * bit in a varbinary but when is loaded hibernate deserialize it. This may be
+   * useful only for temporary data since "Data lives longer then application"
    */
-  @Column(columnDefinition = "number(10,2) default '1'")
-  @org.hibernate.annotations.Generated(org.hibernate.annotations.GenerationTime.INSERT)
-  private BigDecimal initialPrice;
-  private BigDecimal reservePrice;
+
+  // Description can be a really large value. So i choose to map it to a clob
+  // column in db
+  // There is no need to use java.sql.Clob
+  /**
+   * In this case as in the case below Hibernate will render all the value
+   * immediatly and not onDemand this could be an issue in performance
+   */
+  @Lob
+  @Column(name = "ITEM_DESCRIPTION")
+  private String description;
+
+  // The same is true even for image, there is no need to use java.sql.Blob
+  @Lob
+  @Column(name = "ITEM_IMAGE")
+  private byte[] image;
+
+  @org.hibernate.annotations.Type(type = "persistence.MonetaryAmountUserType")
+  @Column(name = "INITIAL_PRICE")
+  private MonetaryAmount initialPrice;
+
+  /**
+   * Don't know which of this two method is correct todo
+   */
+  @AttributeOverrides({
+      @AttributeOverride(name = "amount", column = @Column(name = "RESERVE_PRICE_AMOUNT", columnDefinition = "number(10,2) default '1'")) })
+  private MonetaryAmount reservePrice;
+
+  @Temporal(TemporalType.TIMESTAMP) // It could be Time or Date
+  @Column(name = "START DATE", nullable = false, updatable = false)
   private Date startDate;
   private Date endDate;
 
@@ -72,11 +104,11 @@ public class Item {
   // @Basic(optional = false) // This annotation will set that this method cannot
   // return null at java level
   @Column(nullable = false) // This annotation is responsable for NOT NULL constraint in datbase
-  public BigDecimal getInitialPrice() {
+  public MonetaryAmount getInitialPrice() {
     return initialPrice;
   }
 
-  public BigDecimal getReservePrice() {
+  public MonetaryAmount getReservePrice() {
     return reservePrice;
   }
 
@@ -109,11 +141,11 @@ public class Item {
     this.description = description;
   }
 
-  public void setInitialPrice(BigDecimal initialPrice) {
+  public void setInitialPrice(MonetaryAmount initialPrice) {
     this.initialPrice = initialPrice;
   }
 
-  public void setReservePrice(BigDecimal reservePrice) {
+  public void setReservePrice(MonetaryAmount reservePrice) {
     this.reservePrice = reservePrice;
   }
 

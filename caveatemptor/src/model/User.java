@@ -2,6 +2,9 @@ package model;
 
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+
+import java.util.Currency;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -22,6 +25,7 @@ public class User {
   private String email;
   private int ranking;
   private boolean admin;
+  private static Preference preferences = new Preference(Currency.getInstance("EUR"));
 
   /**
    * Here i have to ovveride columns since home Address and billing Address have
@@ -77,6 +81,10 @@ public class User {
 
   public Address getBillingAddress() {
     return billingAddress;
+  }
+
+  public static Preference getPreferences() {
+    return preferences;
   }
 
   public void setId(Long id) {

@@ -1,7 +1,10 @@
 package model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import persistence.MonetaryAmount;
 
 // This POJO will be immutable... that means that once created cannot be update
 // This will also help avoiding dirty checkings
@@ -22,5 +25,9 @@ public class Bid {
 
   @Id
   private Long id;
+
+  @org.hibernate.annotations.Type(type = "monetary_amount_eur")
+  @org.hibernate.annotations.Columns(columns = { @Column(name = "BID_AMOUNT"), @Column(name = "BID_AMOUNT_CUR") })
+  private MonetaryAmount bidAmount;
 
 }

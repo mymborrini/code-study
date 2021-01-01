@@ -3,15 +3,12 @@ package model;
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "CREDIT_CARD")
 @AttributeOverride(name = "owner", column = @Column(name = "CC_OWNER", nullable = false))
 public class CreditCard extends BillingDetails {
-
-  @Id
-  @Column(name = "CREDIT_CARD_ID")
-  private Long id = null;
 
   @Column(name = "NUMBER", nullable = false)
   private String number;
@@ -21,10 +18,6 @@ public class CreditCard extends BillingDetails {
 
   @Column(name = "EXP_YEAR", nullable = false)
   private String expYear;
-
-  public Long getId() {
-    return id;
-  }
 
   public String getNumber() {
     return number;
@@ -36,10 +29,6 @@ public class CreditCard extends BillingDetails {
 
   public String getExpYear() {
     return expYear;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public void setNumber(String number) {

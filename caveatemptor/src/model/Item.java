@@ -5,13 +5,13 @@ import java.util.Date;
 import java.util.Set;
 import java.util.HashSet;
 
-import javax.persistence.Column;
 /*
 This is an example to show that a lot of hibernate annotations does not exist in JPA
 */
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.Column;
 
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DiscriminatorFormula;

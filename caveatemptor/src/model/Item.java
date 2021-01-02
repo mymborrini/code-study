@@ -21,12 +21,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 
 import org.hibernate.annotations.BatchSize;
@@ -289,6 +291,25 @@ public class Item {
     category.getItems().add(this);
     categories.add(category);
 
+  }
+
+  @OneToMany(mappedBy = "item", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+  @org.hibernate.annotations.Cascade(value = org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+  private Set<Bid> bids = new HashSet<>();
+
+  public void setBids(Set<Bid> bids) {
+    this.bids = bids;
+  }
+
+  public Set<Bid> getBids() {
+    return bids;
+  }
+
+  public void addBid(Bid bid) {
+    bid.setItem(this);
+
+    // This is useless as explained in mappedBy in Bid.class
+    // bids.add(bid);
   }
 
 }

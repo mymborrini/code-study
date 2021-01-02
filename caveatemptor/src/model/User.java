@@ -9,6 +9,9 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
@@ -133,5 +136,26 @@ public class User {
    * public void setName(String name) { StringTokenizer t = new
    * StringTokenizer(name); firstName = t.nextToken(); lastName = t.nextToken(); }
    */
+
+  /**
+   * 
+   */
+  /*
+   * @OneToOne
+   * 
+   * @PrimaryKeyJoinColumn private AddressEntity shippingAddress;
+   */
+
+  public AddressEntity getShippingAddress() {
+    return shippingAddress;
+  }
+
+  public void setShippingAddress(AddressEntity shippingAddress) {
+    this.shippingAddress = shippingAddress;
+  }
+
+  @OneToOne
+  @JoinColumn(name = "SHIPPING_ADDRESS_ID")
+  private AddressEntity shippingAddress;
 
 }

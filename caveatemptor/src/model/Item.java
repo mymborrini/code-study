@@ -17,7 +17,10 @@ import java.util.HashMap;
 This is an example to show that a lot of hibernate annotations does not exist in JPA
 */
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -27,8 +30,10 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.CollectionId;
 import org.hibernate.annotations.DiscriminatorFormula;
 import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.Type;
 
 import persistence.MonetaryAmount;
 
@@ -115,8 +120,23 @@ public class Item {
    * image
    * 
    * | item_id | filename |
+   * 
+   * If you use generic collections hibernate can automatically detect the type of
+   * the element if you use generic collection like this one. Otherwise you have
+   * to specify it.
+   * 
+   * In emmbed it's pretty the same you can also override some column if you want
+   * but all the columns must be not-nullable
    */
-  // private Set images = new HashSet();
+  @org.hibernate.annotations.CollectionOfElements(targetElement = java.lang.String.class)
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @Column(name = "FILENAME", nullable = false)
+  private Set<String> imageSet = new HashSet();
+
+  @org.hibernate.annotations.CollectionOfElements(targetElement = java.lang.String.class)
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @AttributeOverride(name = "element.name", column = @Column(name = "IMAGE_NAME", length = 255, nullable = false))
+  private Set<Image> imagesSetEmbeed = new HashSet<>();
 
   /**
    * With Collection is like a <bag> the order is not preserved indeed With a Set
@@ -129,8 +149,14 @@ public class Item {
    * In this case the primary key is a single column the item_image_id while the
    * other two columns are not null
    * 
+   * With Embeed images you have to specify a CollectionId Annotation
    */
   // private Collection images = new ArrayList();
+
+  @org.hibernate.annotations.CollectionOfElements(targetElement = java.lang.String.class)
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @org.hibernate.annotations.CollectionId(columns = @Column(name = "ITEM_IMAGE_ID"), type = @org.hibernate.annotations.Type(type = "long"), generator = "sequence")
+  private Collection<Image> imageCollectionEmbedeed = new ArrayList();
 
   /**
    * With List you preserve the order of the item inserted. In this case I have to
@@ -140,8 +166,14 @@ public class Item {
    * 
    * | item_id | position | filename |
    * 
+   * In indexColumn base means the starter of the count. If you forget to specify
+   * the index column this list will be treated as a a normal bag collection
    */
-  // private List images = new ArrayList();
+  @org.hibernate.annotations.CollectionOfElements
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @org.hibernate.annotations.IndexColumn(name = "POSITION", base = 1)
+  @Column(name = "filename")
+  private List<String> imageList = new ArrayList();
 
   /**
    * Now suppose that the images for an item hava a user-supplied names in
@@ -151,9 +183,13 @@ public class Item {
    * | item_id | image_name | filename |
    * 
    * In this case i have a composite primary key with image_id and image_name This
-   * map is of course unsorted
+   * map is of course unsorted If the key of the map are not a simple key
    */
-  // private Map images = new HashMap();
+  @org.hibernate.annotations.CollectionOfElements
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @MapKeyColumn(name = "IMAGE_NAME")
+  @Column(name = "FILE_NAME")
+  private Map<String, String> imageMap = new HashMap();
 
   /**
    * In hibernate sorted and ordered have two different meanings sorted is a
@@ -180,8 +216,10 @@ public class Item {
    * | item_id | filename |
    * 
    */
+  @JoinTable(name = "ITEM_IMAGE", joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @Column(name = "FILE_NAME")
   @org.hibernate.annotations.Sort(type = SortType.NATURAL)
-  private SortedSet images = new TreeSet();
+  private SortedSet imageSortedSet = new TreeSet();
 
   /*
    * Hibenrate will consider the following two annotations as the same so it's

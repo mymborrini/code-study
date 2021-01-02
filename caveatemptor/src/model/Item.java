@@ -1,10 +1,18 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.HashSet;
-
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 /*
 This is an example to show that a lot of hibernate annotations does not exist in JPA
 */
@@ -20,6 +28,7 @@ import javax.persistence.Column;
 
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.DiscriminatorFormula;
+import org.hibernate.annotations.SortType;
 
 import persistence.MonetaryAmount;
 
@@ -98,6 +107,81 @@ public class Item {
   public String getDescription() {
     return description;
   }
+
+  /**
+   * With Set the order is not preserved In this case I have a different Table
+   * named for example item_image which as 2 columns (a composite key of this 2
+   * columns) once for the item_id as the primary key and one for filename of the
+   * image
+   * 
+   * | item_id | filename |
+   */
+  // private Set images = new HashSet();
+
+  /**
+   * With Collection is like a <bag> the order is not preserved indeed With a Set
+   * of images you cannot have duplicate images, if you want duplicate images it's
+   * better to use a collection and implement it with new Arraylist In this case I
+   * should have a table with 3 columns
+   * 
+   * | Item_image_id | item_id | filename |
+   * 
+   * In this case the primary key is a single column the item_image_id while the
+   * other two columns are not null
+   * 
+   */
+  // private Collection images = new ArrayList();
+
+  /**
+   * With List you preserve the order of the item inserted. In this case I have to
+   * add an index column in order to persist the position of the element in the
+   * collection So like in a Set the primary key is a composite key of the item_id
+   * primary key and the filename, plus you have an additional column position
+   * 
+   * | item_id | position | filename |
+   * 
+   */
+  // private List images = new ArrayList();
+
+  /**
+   * Now suppose that the images for an item hava a user-supplied names in
+   * addition to the filename; One way to this is with a Map. In this case I will
+   * have a table with 3 columns one for containing the key of the map
+   * 
+   * | item_id | image_name | filename |
+   * 
+   * In this case i have a composite primary key with image_id and image_name This
+   * map is of course unsorted
+   */
+  // private Map images = new HashMap();
+
+  /**
+   * In hibernate sorted and ordered have two different meanings sorted is a
+   * sorted in memory using a Java comparator. An orderd collection is orderd at
+   * the sql level using a SQL query with order_by cause. With Sorted Map you
+   * still have three columns as in map
+   * 
+   * | item_id | image_name | filename |
+   * 
+   * But you are telling hibernate to sort the image accoriding to the compareTo()
+   * method in Java.lang.String if you use natural if you need a different
+   * comparator you can specify as a class which implements java.util.Comparator
+   * in the sort attribute
+   */
+  // @org.hibernate.annotations.Sort(comparator = package.Class.class)
+  // @org.hibernate.annotations.Sort(type = SortType.NATURAL)
+  // private SortedMap images = new TreeMap();
+
+  /**
+   * You can also sort a Set with the same method as well in this case you still
+   * have two columns but with the annotation of sorted too that works exactly
+   * like it works in SortedMap
+   * 
+   * | item_id | filename |
+   * 
+   */
+  @org.hibernate.annotations.Sort(type = SortType.NATURAL)
+  private SortedSet images = new TreeSet();
 
   /*
    * Hibenrate will consider the following two annotations as the same so it's

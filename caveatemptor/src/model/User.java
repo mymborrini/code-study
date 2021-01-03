@@ -4,12 +4,15 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 
 import java.util.Currency;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -157,5 +160,8 @@ public class User {
   @OneToOne
   @JoinColumn(name = "SHIPPING_ADDRESS_ID")
   private AddressEntity shippingAddress;
+
+  @OneToMany(mappedBy = "buyer")
+  private Set<Item> boughtItems = new HashSet<>();
 
 }

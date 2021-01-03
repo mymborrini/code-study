@@ -20,6 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -293,15 +294,38 @@ public class Item {
 
   }
 
+  /**
+   * Lets' make some one to many consideration. For performance reason the best
+   * way to implement this is with a Collection (a bag) because I don't need to
+   * maintain index of its elements like a list or check for duplicate elements
+   * like a set. So in this case I can add new elements without triggering the
+   * loading. On the other hand I don't risk to have duplicate elements in this
+   * case since mappedby is active bids chages are ignored, all the changes for
+   * this relation are triggered by item in Bid so it would be impossible to have
+   * a duplication.
+   * 
+   * What about if I want and index position. This can be really complicated...
+   * firstAble you cannot have a mapped by and all the changes has to be done in
+   * bids since bids contains the position of the element. So you have to remove
+   * the mapped by, change the addBid method and change the item annotations on
+   * the Bid side. Second the Bid table should handle a position column and his
+   * many to one item should be updatable false and insertable false in order to
+   * tell hibernate to ingore the persistence in memory changes by this side
+   */
   @OneToMany(mappedBy = "item", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
   @org.hibernate.annotations.Cascade(value = org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-  private Set<Bid> bids = new HashSet<>();
+  private Collection<Bid> bids = new ArrayList<>();
 
-  public void setBids(Set<Bid> bids) {
+  @OneToMany
+  @JoinColumn(name = "ITEM_ID_INVERSE", nullable = false)
+  @org.hibernate.annotations.IndexColumn(name = "BID_POSITION")
+  private List<Bid> bidsWithPosition = new ArrayList<>();
+
+  public void setBids(Collection<Bid> bids) {
     this.bids = bids;
   }
 
-  public Set<Bid> getBids() {
+  public Collection<Bid> getBids() {
     return bids;
   }
 
@@ -311,5 +335,28 @@ public class Item {
     // This is useless as explained in mappedBy in Bid.class
     // bids.add(bid);
   }
+
+  /**
+   * let's think about a useful addition to add to the item class a buyer
+   * property. You can then call item.getBuyer() to get the user which wins this
+   * Item. Why this assossiaction is dfferent from Item Bid, is because this
+   * reference is optional. So this buyer column must be nullable since a
+   * particular item cannot be sold still. An optional entity association, be it a
+   * one-to-one or a one-to-many is best represented in sql schema with a join
+   * table. You use a Set as the collection type for this ITEM_BUYER_TABLE
+   * 
+   * | item_id | -> <<PK>> <<FK>> <<UNIQUE>>
+   * 
+   * | user_id | -> <<PK>> <<FK>>
+   * 
+   * All of this to indicates an optional one-tp-many. This has a limitation since
+   * you cannot se nullable false to joinColumn user_id if you try it hibernate
+   * thinks thata buyer must be nullable false and this what we don't want To make
+   * it bidirectional add a onetomany to user
+   */
+  @ManyToOne
+  @JoinTable(name = "ITEM_BUYER", joinColumns = { @JoinColumn(name = "ITEM_ID") }, inverseJoinColumns = {
+      @JoinColumn(name = "USER_ID") })
+  private User buyer;
 
 }

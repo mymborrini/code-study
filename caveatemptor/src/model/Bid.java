@@ -136,6 +136,13 @@ public class Bid {
   @JoinColumn(name = "ITEM_ID") // , nullable = false)
   private Item item;
 
+  @ManyToOne
+  @JoinColumn(name = "ITEM_ID_INVERSE", nullable = false, updatable = false, insertable = false)
+  private Item itemInverse;
+
+  @Column(name = "BID_POSITION")
+  private int position;
+
   public void setItem(Item item) {
     this.item = item;
   }

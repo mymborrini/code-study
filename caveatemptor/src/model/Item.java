@@ -20,6 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
@@ -48,6 +49,7 @@ import persistence.MonetaryAmount;
 @DiscriminatorFormula("case when ITEM_IS_SPECIAL is not null then A else B")
 public class Item {
 
+  private Long id;
   private String name;
 
   /**
@@ -358,5 +360,24 @@ public class Item {
   @JoinTable(name = "ITEM_BUYER", joinColumns = { @JoinColumn(name = "ITEM_ID") }, inverseJoinColumns = {
       @JoinColumn(name = "USER_ID") })
   private User buyer;
+
+  @ManyToMany(mappedBy = "itemSetManyToMany", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  private Set<Category> categoriesSetManyToMany = new HashSet<>();
+
+  public Set<Category> getCategoriesSetManyToMany() {
+    return categoriesSetManyToMany;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  // In this case remove is essential since the Categorized Item is an Entity
+  @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+  private Set<CategorizedItem> categorizedItems = new HashSet<>();
+
+  public Set<CategorizedItem> getCategorizedItems() {
+    return categorizedItems;
+  }
 
 }

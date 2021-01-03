@@ -17,7 +17,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.graalvm.compiler.lir.LIRInstruction.Use;
 import org.hibernate.annotations.CollectionId;
 
 @Entity

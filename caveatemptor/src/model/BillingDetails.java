@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 
 /**
  * with this table_per_class a query generated for this class works like this
@@ -45,5 +46,8 @@ public abstract class BillingDetails {
   public void setOwner(String owner) {
     this.owner = owner;
   }
+
+  @ManyToOne
+  private User user;
 
 }

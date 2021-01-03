@@ -2,8 +2,10 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -15,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.graalvm.compiler.lir.LIRInstruction.Use;
 import org.hibernate.annotations.CollectionId;
 
 @Entity
@@ -162,5 +165,22 @@ public class Category {
   @org.hibernate.annotations.CollectionOfElements
   @JoinTable(name = "CATEGORY_ITEM", joinColumns = @JoinColumn(name = "CATEGORY_ID"))
   private Set<CategorizedItemValueType> categorizedItemValueTypes = new HashSet<>();
+
+  /**
+   * A common situation is to map a ternary association with the user who added
+   * the item for example. You can use a Map for that. The advantage of this
+   * strategy is that you don't need any extra table. So let's see CATEGORY_ITEM
+   * 
+   * | category_id <<PK>> <<FK>> | item_id <<PK>> <<FK>> | added_by_user_id <<FK>>
+   * 
+   * To create a link if all youe instances are arleardy in persistent state is
+   * enough to create a link to the map
+   * 
+   * 
+   */
+  @ManyToMany
+  @org.hibernate.annotations.MapKeyManyToMany(joinColumns = @JoinColumn(name = "ITEM_ID"))
+  @JoinTable(name = "CATEGORY_ITEM", joinColumns = @JoinColumn(name = "CATEGORY_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID"))
+  private Map<Item, User> itemsAndUser = new HashMap<>();
 
 }

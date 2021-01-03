@@ -22,6 +22,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -380,4 +381,20 @@ public class Item {
     return categorizedItems;
   }
 
+  /**
+   * Now let's see how to map a many to many with a Map. We can use the @MapKey
+   * annotation of jpa it maps a property of the target entity as the key of the
+   * map. Because the key of a map form a set, values are expected to be unique
+   * for a particular map so if you don't choose the primary key if have to choose
+   * at least some unique property.
+   * 
+   * A more common situation is a map in the middle of a ternary association. See
+   * category file here is only the inverse of the category
+   */
+  @MapKey(name = "id")
+  @OneToMany
+  private Map<Long, Bid> bidsByIdentifier = new HashMap<>();
+
+  @ManyToMany(mappedBy = "itemsAndUser", cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+  private Map<Category, User> categoryAndUserMap = new HashMap<>();
 }

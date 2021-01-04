@@ -18,6 +18,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import freemarker.core.ReturnInstruction;
+
 @Entity
 @Table(name = "USER")
 public class User {
@@ -241,4 +243,93 @@ public class User {
   @OneToMany(mappedBy = "user")
   @JoinColumn(name = "USER_ID")
   private Set<BillingDetails> billingDetails;
+
+  /**
+   * Let's see how to implement equals and hashcode. A clever approch is to
+   * implemant equals to compare just the database identifier property (often a
+   * surrogate primary key value). But this contains a problem, hibernate does not
+   * set an identifier until an object become peristent. If a transient object is
+   * added to set before being saved its hash value may change while it's
+   * contained by the set, contrary to the contract of java.util.Set. In
+   * particular this problem makes cascade save useless for sets. So database
+   * identifier equality is not the correct solution
+   * 
+   * A better way is to include all not null persistent properties apart the
+   * database identifier and collections, firstable because they belong to
+   * different table and second because you don't want to retrieve the entire
+   * object graph to be retrieved just to perform an equals. But this contains two
+   * main problem, the same db instance can be different between two session and
+   * two different instance may be equals because username and password are the
+   * same casually
+   * 
+   * EQUALITY WITH BUISINESS KEY: A business key is a property. or some
+   * combinations of propery that is unique for each instance with the same
+   * database identity. Essentialy is the natural key that you would use if you
+   * didn't use the surrogate primary key instead. For example for User class it
+   * will be the username which is unique, and rarely changes In equals other use
+   * ALWAY getter method, this is really important because the object instace
+   * passed as other may be a proxy object not an actual instace that holds the
+   * persistence state
+   */
+
+  public boolean equalsDbIdentifier(Object other) {
+    if (this == other)
+      return true;
+    if (id == null)
+      return false;
+    if (!other.getClass().equals(this.getClass()))
+      return false;
+    final User that = (User) other;
+    return this.id.equals(that.getId());
+  }
+
+  public int hashCodeDbIdentifier() {
+    return id == null ? System.identityHashCode(this) : id.hashCode();
+  }
+
+  public boolean equalsAllProperties(Object other) {
+    if (this == other)
+      return true;
+    if (!other.getClass().equals(this.getClass()))
+      return false;
+
+    final User that = (User) other;
+    if (!this.getUsername().equals(that.getUsername())) {
+      return false;
+    }
+
+    if (!this.getPassword().equals(that.getPassword())) {
+      return false;
+    }
+
+    return true;
+
+  }
+
+  public int hashCodeAllProperties() {
+    final int prime = 29;
+    int result = 14;
+    result = prime * result + getUsername().hashCode();
+    result = prime * result + getPassword().hashCode();
+    return result;
+  }
+
+  public boolean equalsBusinessKey(Object other) {
+    if (this == other)
+      return true;
+    if (!other.getClass().equals(this.getClass()))
+      return false;
+
+    User that = (User) other;
+
+    if (!this.username.equals(that.getUsername())) {
+      return false;
+    }
+    return true;
+  }
+
+  public int hashCodeBusinessKey() {
+    return username.hashCode();
+  }
+
 }

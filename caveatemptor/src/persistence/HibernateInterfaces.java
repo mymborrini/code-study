@@ -40,7 +40,8 @@ import model.Item;
  * Hibernate flushes occur at the following times: when transaction are commited
  * before query is executed, when the application call session.flush().
  * Hibernate doesn't flush before every query, only if there in-memory data that
- * can influence the query
+ * can influence the query.
+ * 
  * 
  */
 public class HibernateInterfaces {
